@@ -1,63 +1,54 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
   const [countries, setCountries] = useState([]);
   const [filteredCountries, setFilteredCountries] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [error, setError] = useState(null);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    axios
-      .get("https://restcountries.com/v3.1/all")
-      .then((response) => {
-        setCountries(response.data);
-        setFilteredCountries(response.data);
+    fetch("https://restcountries.com/v3.1/all")
+      .then((res) => res.json())
+      .then((data) => {
+        setCountries(data);
+        setFilteredCountries(data);
       })
-      .catch((error) => {
-        setError(error);
-        console.error("Error fetching countries:", error);
-      });
+      .catch((err) => console.error("Error fetching data: ", err));
   }, []);
-
   useEffect(() => {
-    if (!searchTerm) {
+    if (search) {
+      let filteredList = countries.filter((e) =>
+        e.name.common.toLowerCase().includes(search.toLowerCase()),
+      );
+      setFilteredCountries(filteredList);
+    } else {
       setFilteredCountries(countries);
-      return;
     }
-
-    const filtered = countries.filter((country) =>
-      country.name.common.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-    setFilteredCountries(filtered);
-  }, [searchTerm, countries]);
-
+  }, [search]);
   return (
-    <div className="App">
-      <div className="search-container">
+    <>
+      <div style={{ textAlign: "center", background: "#ccc", padding: "15px" }}>
         <input
           type="text"
-          placeholder="Search for countries..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="search-input"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ width: "600px", padding: "5px", borderRadius: "5px" }}
+          placeholder="Select for countries..."
         />
       </div>
-      {error && <div className="error">Error: {error.message}</div>}
-      <div className="countries-container">
+      <div className="wrapper ">
         {filteredCountries.map((country) => (
-          <div className="countryCard" key={country.name.common}>
+          <div key={country.cca3} className="card countryCard">
             <img
+              className="img"
               src={country.flags.png}
-              alt={country.name.common}
-              className="country-flag"
+              alt={`Flag of ${country.name.common}`}
             />
-            <div className="country-name">{country.name.common}</div>
+            <h2>{country.name.common}</h2>
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 }
 
