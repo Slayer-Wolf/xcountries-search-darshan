@@ -45,8 +45,8 @@ function App() {
         />
       </div>
       {error && <div className="error">Error: {error.message}</div>}
-      <div className="countries-container">
-        {filteredCountries.map((country) => (
+      {filteredCountries.map((country) => (
+        <div className="countries-container">
           <div
             className={`countryCard${country.name.common.toLowerCase() === searchTerm.toLowerCase() ? " centered" : ""}`}
             key={country.name.common}
@@ -58,8 +58,8 @@ function App() {
             />
             <div className="country-name">{country.name.common}</div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 }
