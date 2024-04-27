@@ -36,10 +36,13 @@ function App() {
         onChange={handleSearch}
       />
       <div className="countries-container">
-        {filteredCountries.map((country, index) => (
+        {filteredCountries.map((countryCard, index) => (
           <div className="countryCard" key={index}>
-            <img src={country.flags.png} alt={`${country.name.common} flag`} />
-            <p>{country.name.common}</p>
+            <img
+              src={countryCard.flags?.png}
+              alt={`${countryCard.name.common} flag`}
+            />
+            <p>{countryCard?.name.common}</p>
           </div>
         ))}
       </div>
