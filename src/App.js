@@ -1,54 +1,88 @@
-import { useEffect, useState } from "react";
-import "./App.css";
+import React, { useState, useEffect } from "react";
 
 function App() {
   const [countries, setCountries] = useState([]);
-  const [filteredCountries, setFilteredCountries] = useState([]);
-  const [search, setSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     fetch("https://restcountries.com/v3.1/all")
-      .then((res) => res.json())
+      .then((response) => response.json())
       .then((data) => {
         setCountries(data);
-        setFilteredCountries(data);
+        setSearchResults(data);
       })
-      .catch((err) => console.error("Error fetching data: ", err));
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
-  useEffect(() => {
-    if (search) {
-      let filteredList = countries.filter((e) =>
-        e.name.common.toLowerCase().includes(search.toLowerCase()),
-      );
-      setFilteredCountries(filteredList);
-    } else {
-      setFilteredCountries(countries);
-    }
-  }, [search]);
+
+  const handleSearch = (event) => {
+    const searchTerm = event.target.value.toLowerCase();
+    setSearchTerm(searchTerm);
+    const filteredCountries = countries.filter((country) =>
+      country.name.common.toLowerCase().includes(searchTerm),
+    );
+    setSearchResults(filteredCountries);
+  };
+
+  const imageStyle = {
+    width: "100px",
+    height: "100px",
+  };
+
+  const containerStyle = {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+  };
+
+  const countryCard = {
+    width: "200px",
+    border: "1px solid #ccc",
+    borderRadius: "10px",
+    margin: "10px",
+    padding: "10px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+
+  const inputStyle = {
+    position: "sticky",
+    width: "500px",
+    height: "30px",
+    border: "10px",
+  };
+  const containerStyle2 = {
+    width: "100vh",
+  };
+
   return (
-    <>
-      <div style={{ textAlign: "center", background: "#ccc", padding: "15px" }}>
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{ width: "600px", padding: "5px", borderRadius: "5px" }}
-          placeholder="Select for countries..."
-        />
+    <div style={containerStyle2}>
+      <input
+        type="text"
+        placeholder="Search for a country..."
+        value={searchTerm}
+        onChange={handleSearch}
+        style={inputStyle}
+      />
+      <div style={containerStyle}>
+        {searchResults.map((country) => {
+          return (
+            <div className="countryCard" key={country.cca3} style={countryCard}>
+              <img
+                src={country.flags.png}
+                alt={`flat of ${country.name.common}`}
+                style={imageStyle}
+              />
+              <h2>{country.name.common}</h2>
+            </div>
+          );
+        })}
       </div>
-      <div className="wrapper ">
-        {filteredCountries.map((country) => (
-          <div key={country.cca3} className="card countryCard">
-            <img
-              className="img"
-              src={country.flags.png}
-              alt={`Flag of ${country.name.common}`}
-            />
-            <h2>{country.name.common}</h2>
-          </div>
-        ))}
-      </div>
-    </>
+    </div>
   );
 }
 
